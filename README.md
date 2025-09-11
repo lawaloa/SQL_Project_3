@@ -480,7 +480,8 @@ This way, I can directly see *which employees* are responsible for the discrepan
 
 <details>
 <summary>💻 Click to view SQL query</summary>
-  
+
+  ```sql
 SELECT 
     v.record_id AS visit_record_id, 
     a.location_id AS auditor_location_id, 
