@@ -22,6 +22,9 @@ At the heart of the story is an independent audit of the Maji Ndogo water projec
 
 For me, this project wasn’t just about practicing SQL. It was about **learning how to weave analysis into a narrative** — turning queries and numbers into a compelling data story that resonates with both technical and non-technical audiences.  
 
+✅ Skills Applied:  
+SQL · Joins · Data Cleaning · Data Aggregation · Filtering · Grouping · Counting · Data Validation · Data Integrity Checks · Exploratory Data Analysis (EDA) · Analytical Thinking · Data Storytelling
+
 ---
 
 ### 📧 Audit Correspondence (Narrative Layer of the Project)  
@@ -343,7 +346,7 @@ AND  v.visit_count = 1;
 📊 **Sample Output (Discrepancies)**
 
 <details> 
-<summary>💻 Click to view the table with sample data with discrepancies)</summary>
+<summary>💻 Click to view the table with sample data with discrepancies</summary>
 
 
 | location\_id | record\_id | auditor\_score | surveyor\_score |
@@ -404,7 +407,7 @@ AND  v.visit_count = 1;
 </details>
 
 > [!Note]
-> ##### 🎯 Conclusion
+> ### 🎯 Conclusion
 > 
 > Even though **scores differed in 102 cases**, the **water source types matched**.
 > This means the **core integrity of the source data remains intact**, and our earlier analyses using `type_of_water_source` are still valid.
