@@ -163,6 +163,7 @@ To bring these together, I wrote the following query:
 
 <details>
 <summary>Click to view SQL query</summary>
+  
 ```sql
 SELECT 
     v.location_id AS visit_locationid,
