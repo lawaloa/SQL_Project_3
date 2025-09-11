@@ -68,8 +68,33 @@ Sincerely,
 
 ---
 
-## 🔗 Generating an ERD  
-*(Content placeholder – add your ERD image or SQL schema notes here)*  
+## 🔗 Generating an ERD 
+---
+
+[ERD for Maji Ndogo water_services database](https://github.com/lawaloa/SQL_Project_3/blob/main/EER_Project_3.png) 
+
+Before I could integrate the auditor’s report, I realized it was crucial to fully understand the **database structure**. This meant starting with an **Entity Relationship Diagram (ERD)** to map out how the tables in the `md_water_services` database connected to each other.  
+
+The **visits** table quickly stood out as the central table. It links to other tables using foreign keys:  
+- `location_id` → connected to the **location** table  
+- `source_id` → connected to the **water_source** table  
+- `assigned_employee_id` → connected to the **employee** table  
+
+Each of these is a primary key in its respective table, but they act as foreign keys within **visits**.  
+
+Here’s how I interpreted some of the relationships:  
+
+- **Location ↔ Visits (One-to-Many):**  
+  Each unique entry in the `location` table represents one place we’ve been, while the `visits` table logs *every single time* we visited that location. Naturally, one location can have many visits, making this a one-to-many relationship.  
+
+- **Visits ↔ Water Quality (Intended One-to-One):**  
+  My initial understanding was that every recorded visit should have *exactly one* corresponding water quality score. That would make this a one-to-one relationship. However, when I checked the ERD, it showed a many-to-one relationship — which didn’t make sense.  
+
+I double-checked the database and confirmed that `record_id` is unique in both the `visits` and `water_quality` tables, which supports the one-to-one relationship I expected. To correct this, I updated the relationship in the ERD by editing the foreign key settings and changing the cardinality to **one-to-one**.  
+
+This small exercise was a powerful reminder: **getting the relationships right at the start prevents big headaches later**. Misrepresenting relationships could lead to faulty joins, misleading results, and ultimately bad decisions. By carefully validating the ERD, I ensured my queries (and the audit integration) would stand on solid ground.  
+
+
 
 ## 📥 Integrating the Report  
 *(Content placeholder – describe how you imported the audit report into the database)*  
