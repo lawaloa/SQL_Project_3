@@ -393,7 +393,7 @@ AND  v.visit_count = 1;
 📊 **Sample Output (Source Type Comparison)**
 
 <details> 
-<summary>💻 Click to view the table with sample data with additional features for source type comparison)</summary>
+<summary>💻 Click to view the table with sample data with additional features for source type comparison</summary>
 
 | location\_id | auditor\_source       | survey\_source        | record\_id | auditor\_score | surveyor\_score |
 | ------------ | --------------------- | --------------------- | ---------- | -------------- | --------------- |
@@ -416,7 +416,113 @@ AND  v.visit_count = 1;
 ## 🔗 Linking Records: Joining employee data to the report
 ---
 
-*(Content placeholder – explain how you joined employee data with the audit findings)*  
+Now that I’ve identified the 102 incorrect records, the next step was to dig deeper and see who was responsible for assigning those scores.
+
+At some of the locations, employees recorded incorrect scores — and those records made it into this error set.
+
+I think there are two possible reasons this happened:
+
+These workers are humans, and mistakes are bound to occur.
+
+Alternatively, there could have been intentional misreporting (which would be more serious).
+
+Either way, the **employees were the source of the discrepancies**, so I decided to **JOIN the** `assigned_employee_id` from the `employee` table with the query. This allowed me to directly link each incorrect record to the staff member who submitted it.
+
+Here’s the query I wrote:
+
+<details> 
+<summary>💻 Click to view SQL query</summary>
+  
+```sql
+SELECT 
+    v.record_id AS visit_record_id, 
+    a.location_id AS auditor_location_id, 
+    a.true_water_source_score AS auditor_score,
+    w.subjective_quality_score AS surveyor_score,
+    e.assigned_employee_id AS assigned_employee_id
+FROM visits AS v
+JOIN auditor_report AS a
+    ON v.location_id = a.location_id
+JOIN water_quality AS w
+    ON v.record_id = w.record_id
+JOIN employee AS e
+    ON v.assigned_employee_id = e.assigned_employee_id
+WHERE (a.true_water_source_score - w.subjective_quality_score != 0)
+  AND v.visit_count = 1;
+```
+
+</details>
+
+✅ **What I got back (sample)**:
+
+<details> 
+<summary>💻 Click to view the table</summary>
+  
+| location\_id | visit\_record\_id | assigned\_employee\_id | auditor\_score | surveyor\_score |
+| ------------ | ----------------- | ---------------------- | -------------- | --------------- |
+| AkRu05215    | 21160             | 34                     | 3              | 10              |
+| KiRu29290    | 7938              | 1                      | 3              | 10              |
+| KiHa22748    | 43140             | 1                      | 9              | 10              |
+| SoRu37841    | 18495             | 34                     | 6              | 10              |
+| KiRu27884    | 33931             | 1                      | 1              | 10              |
+| KiZu31170    | 17950             | 5                      | 9              | 10              |
+| …            | …                 | …                      | …              | …               |
+
+</details>
+
+By surfacing the `assigned_employee_id`, I could now clearly **trace the errors back to specific employees**. This was the key to uncovering potential patterns — for instance, *are the same employees making repeated mistakes?*
+
+### 🧑‍💼 Linking Incorrect Records to Employees
+
+Now that I’ve tied the errors back to employees, I realized that employee IDs alone weren’t very helpful for identifying patterns. Thankfully, the `employee` table also stores names, so I updated the query to pull in **employee names** instead of IDs.
+
+This way, I can directly see *which employees* are responsible for the discrepancies — making the results more interpretable.
+
+<details>
+<summary>💻 Click to view SQL query</summary>
+  
+SELECT 
+    v.record_id AS visit_record_id, 
+    a.location_id AS auditor_location_id, 
+    a.true_water_source_score AS auditor_score,
+    w.subjective_quality_score AS surveyor_score,
+    e.employee_name AS employee_name
+FROM visits AS v
+JOIN auditor_report AS a
+    ON v.location_id = a.location_id
+JOIN water_quality AS w
+    ON v.record_id = w.record_id
+JOIN employee AS e
+    ON v.assigned_employee_id = e.assigned_employee_id
+WHERE (a.true_water_source_score - w.subjective_quality_score != 0)
+  AND v.visit_count = 1;
+```
+
+</details>
+
+✅ **Sample Output**:
+
+<details> 
+<summary>💻 Click to view the table</summary>
+
+| location\_id | visit\_record\_id | employee\_name | auditor\_score | surveyor\_score |
+| ------------ | ----------------- | -------------- | -------------- | --------------- |
+| AkRu05215    | 21160             | Rudo Imani     | 3              | 10              |
+| KiRu29290    | 7938              | Bello Azibo    | 3              | 10              |
+| KiHa22748    | 43140             | Bello Azibo    | 9              | 10              |
+| SoRu37841    | 18495             | Rudo Imani     | 6              | 10              |
+| …            | …                 | …              | …              | …               |
+
+</details>
+
+> 📌 With this adjustment, the analysis moves from *abstract numbers to human accountability*.
+> Now the discrepancies can be traced not just to records, but to the actual **employees responsible**. This opens the door to asking critical questions like:
+> - *Are certain employees consistently making the same mistakes?*
+> - *Do these errors cluster in particular regions or sites?*
+> - *Could this indicate a need for retraining — or possible intentional misreporting?*
+
+
+
 
 ## 🔍 Gathering Evidence: Building a complex query seeking truth
 ---
