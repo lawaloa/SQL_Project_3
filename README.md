@@ -71,8 +71,10 @@ Sincerely,
 ## 🔗 Generating an ERD: Understanding the database structure
 ---
 
+<details>
+<summary>Click to view output</summary>
 ![ERD for Maji Ndogo water_services database](https://github.com/lawaloa/SQL_Project_3/blob/main/EER_Project_3.png?raw=true)
-
+</details>
 
 Before I could integrate the auditor’s report, I realized it was crucial to fully understand the **database structure**. This meant starting with an **Entity Relationship Diagram (ERD)** to map out how the tables in the `md_water_services` database connected to each other.  
 
@@ -100,7 +102,93 @@ This small exercise was a powerful reminder: **getting the relationships right a
 ## 📥 Integrating the Report: Adding the auditor report to our database
 ---
 
-*(Content placeholder – describe how you imported the audit report into the database)*  
+After mapping out the database structure with the ERD, the next step was to bring in the **auditor’s report**. This report came as a `.csv` file containing independent verification of water source quality across multiple locations.  
+
+---
+
+### 🗄️ Creating the Auditor Report Table  
+
+To prepare the database, I created a table to hold the auditor’s results:  
+
+<details>
+<summary>Click to view output</summary>
+```sql
+DROP TABLE IF EXISTS `auditor_report`;
+CREATE TABLE `auditor_report` (
+  `location_id` VARCHAR(32),
+  `type_of_water_source` VARCHAR(64),
+  `true_water_source_score` INT DEFAULT NULL,
+  `statements` VARCHAR(255)
+);
+```
+</details>
+
+I then imported the `.csv` file. The dataset contained **1,620 records**, each representing a revisited water source.  
+
+---
+
+### 📑 Auditor’s Dataset Structure  
+
+The dataset included the following columns:  
+
+- **`location_id`** → unique identifier for each site  
+- **`type_of_water_source`** → e.g., well, pump, stream  
+- **`true_water_source_score`** → independently verified quality score  
+- **`statements`** → remarks from locals at the site  
+
+---
+
+### 🔍 Framing the Key Questions  
+
+At this point, I wanted to answer two main questions:  
+
+1. **Is there a difference between the surveyors’ recorded scores and the auditors’ scores?**  
+2. **If so, are there patterns in those differences?**  
+
+---
+
+### 🔗 Linking Auditor Data with Surveyor Data  
+
+A challenge appeared:  
+
+- The **`auditor_report`** table used `location_id`  
+- The **`water_quality`** table used `record_id`  
+- The **`visits`** table acted as the bridge, since it links `location_id` and `record_id`  
+
+To bring these together, I wrote the following query:  
+
+<details>
+<summary>Click to view output</summary>
+```sql
+SELECT 
+    v.location_id AS visit_locationid,
+    v.record_id AS visit_recordid,
+    a.location_id AS auditor_locationid,
+    a.true_water_source_score AS auditor_water_score,
+    w.subjective_quality_score AS surveyor_score
+FROM visits AS v
+JOIN auditor_report AS a
+    ON v.location_id = a.location_id
+JOIN water_quality AS w
+    ON v.record_id = w.record_id;
+```
+</details>
+
+
+📊 **Sample Output**
+
+The query produced a comparison of the auditor’s independent scores and the surveyor’s recorded scores for the same sites:
+
+<details>
+<summary>Click to view output</summary>
+
+| location_id | auditor_water_score | surveyor_score |
+|-------------|---------------------|----------------|
+| AkHa00008   | 3                   | 5              |
+| AkHa00053   | 9                   | 6              |
+| ...         | ...                 | ...            |
+</details>
+
 
 ## 🔗 Linking Records: Joining employee data to the report
 ---
