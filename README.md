@@ -524,6 +524,129 @@ WHERE (a.true_water_source_score - w.subjective_quality_score != 0)
 >  - *Could this indicate a need for retraining — or possible intentional misreporting?*
 
 
+### 🏗️ Refactoring into a CTE
+
+The query was starting to get big and messy, so I refactored it into a **Common Table Expression (CTE)** called `Incorrect_records`.
+
+This way, I can call it like a table in any follow-up analysis without rewriting all the JOINs. Much cleaner and easier to manage!
+
+<details> 
+<summary>💻 Click to view SQL query</summary>
+
+```sql
+WITH Incorrect_records AS (
+    SELECT 
+        v.record_id AS visit_recordid,
+        a.location_id AS auditor_locationid,
+        a.true_water_source_score AS auditor_score,
+        w.subjective_quality_score AS surveyor_score,
+        e.employee_name AS employee_name
+    FROM visits AS v
+    JOIN auditor_report AS a
+        ON v.location_id = a.location_id
+    JOIN water_quality AS w
+        ON v.record_id = w.record_id
+    JOIN employee AS e
+        ON v.assigned_employee_id = e.assigned_employee_id
+    WHERE (a.true_water_source_score - w.subjective_quality_score != 0)
+      AND v.visit_count = 1
+)
+
+SELECT * FROM Incorrect_records;
+```
+
+</details>
+
+✅ Running this gave me the exact same results as before — meaning the CTE is working correctly!
+
+### 🔎 Who’s Making the Mistakes?
+
+Now that I have the `Incorrect_records` table, I can start asking better questions.
+
+First, I wanted to see which employees even showed up in this error list. That’s as simple as grabbing **distinct names**:
+
+<details> <summary>💻 Click to view SQL query</summary>
+WITH Incorrect_records AS (
+    SELECT 
+        v.record_id AS visit_recordid,
+        a.location_id AS auditor_locationid,
+        a.true_water_source_score AS auditor_score,
+        w.subjective_quality_score AS surveyor_score,
+        e.employee_name AS employee_name
+    FROM visits AS v
+    JOIN auditor_report AS a
+        ON v.location_id = a.location_id
+    JOIN water_quality AS w
+        ON v.record_id = w.record_id
+    JOIN employee AS e
+        ON v.assigned_employee_id = e.assigned_employee_id
+    WHERE (a.true_water_source_score - w.subjective_quality_score != 0)
+      AND v.visit_count = 1
+)
+SELECT DISTINCT employee_name
+FROM Incorrect_records;
+
+</details>
+
+✅ I got **17 employees** who made mistakes.
+
+Next, I wanted to see *how many times each employee messed up*. Basically, we just need to **count how many rows** each employee has in the `Incorrect_records` list.
+
+<details> 
+<summary>💻 Click to view SQL query</summary>
+
+```sql
+WITH Incorrect_records AS (
+SELECT 
+    v.record_id AS visit_recordid,
+    a.location_id AS auditor_locationid,
+    a.true_water_source_score AS auditor_score,
+    w.subjective_quality_score AS surveyor_score,
+    e.employee_name AS employee_name
+FROM visits AS v
+JOIN auditor_report AS a
+    ON v.location_id = a.location_id
+JOIN water_quality AS w
+    ON v.record_id = w.record_id
+JOIN employee AS e
+	ON v.assigned_employee_id = e.assigned_employee_id
+WHERE (a.true_water_source_score - w.subjective_quality_score != 0)
+AND  v.visit_count = 1
+)
+SELECT 
+	employee_name,
+    COUNT(employee_name) AS number_of_mistakes
+FROM Incorrect_records
+GROUP BY employee_name;
+```
+
+</details>
+
+📑 **Sample Output**:
+
+<details> 
+<summary>💻 Click to view the table</summary>
+
+| employee\_name | number\_of\_mistakes |
+| -------------- | -------------------- |
+| Bello Azibo    | 26                   |
+| Zuriel Matembo | 17                   |
+| Rudo Imani     | 5                    |
+| Yewande Ebele  | 3                    |
+| ...            | ...                  |
+
+</details>
+
+> #### 🔍 Spotting Patterns in Mistakes  
+>  
+> Looking at the results, a clear pattern emerges:  
+>  
+> - A **few surveyors** are responsible for a **large number of mistakes**.  
+> - Meanwhile, most surveyors only made a handful of errors.  
+>  
+> That doesn’t sit right with me! 😬 It raises the possibility that these aren’t just random mistakes — some scores may have been **intentionally recorded incorrectly**.  
+>  
+> ⚖️ While human error is expected, this distribution — where a small group of employees is responsible for most of the discrepancies — is **suspicious and worth investigating further**.  
 
 
 ## 🔍 Gathering Evidence: Building a complex query seeking truth
