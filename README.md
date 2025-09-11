@@ -4,11 +4,11 @@
 
 ## 📑 Table of Contents
 
-- [Project Overview: Setting the stage for our data exploration journey](#-project-overview)  
-- [Generating an ERD: Understanding the database structure](#-generating-an-erd)  
-- [Integrating the report: Adding the auditor report to our database](#-integrating-the-report)  
-- [Linking records: Joining employee data to the report](#-linking-records)  
-- [Gathering evidence: Building a complex query seeking truth](#-gathering-evidence)  
+- [Project Overview: Setting the stage for our data exploration journey](#project-overview-setting-the-stage-for-our-data-exploration-journey) 
+- [Generating an ERD: Understanding the database structure](#-generating-an-erd-understanding-the-database-structure)  
+- [Integrating the report: Adding the auditor report to our database](#-integrating-the-report-adding-the-auditor-report-to-our-database)  
+- [Linking records: Joining employee data to the report](#-linking-records-joining-employee-data-to-the-report)  
+- [Gathering evidence: Building a complex query seeking truth](#-gathering-evidence-building-a-complex-query-seeking-truth)  
 - [Personal Takeaway](#-personal-takeaway)  
 
 ---
@@ -68,7 +68,7 @@ Sincerely,
 
 ---
 
-## 🔗 Generating an ERD 
+## 🔗 Generating an ERD: Understanding the database structure
 ---
 
 ![ERD for Maji Ndogo water_services database](https://github.com/lawaloa/SQL_Project_3/blob/main/EER_Project_3.png?raw=true)
@@ -97,13 +97,19 @@ This small exercise was a powerful reminder: **getting the relationships right a
 
 
 
-## 📥 Integrating the Report  
+## 📥 Integrating the Report: Adding the auditor report to our database
+---
+
 *(Content placeholder – describe how you imported the audit report into the database)*  
 
-## 🔗 Linking Records  
+## 🔗 Linking Records: Joining employee data to the report
+---
+
 *(Content placeholder – explain how you joined employee data with the audit findings)*  
 
-## 🔍 Gathering Evidence  
+## 🔍 Gathering Evidence: Building a complex query seeking truth
+---
+
 *(Content placeholder – highlight the complex SQL queries you wrote to uncover tampered records)*  
 
 ---
