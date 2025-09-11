@@ -517,6 +517,7 @@ WHERE (a.true_water_source_score - w.subjective_quality_score != 0)
 </details>
 
 >  📌 With this adjustment, the analysis moves from *abstract numbers to human accountability*.
+> 
 >  Now the discrepancies can be traced not just to records, but to the actual **employees responsible**. This opens the door to asking critical questions like:
 >  - *Are certain employees consistently making the same mistakes?*
 >  - *Do these errors cluster in particular regions or sites?*
