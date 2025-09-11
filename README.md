@@ -72,8 +72,10 @@ Sincerely,
 ---
 
 <details>
-<summary>Click to view output</summary>
+<summary>Click to view chart</summary>
+  
 ![ERD for Maji Ndogo water_services database](https://github.com/lawaloa/SQL_Project_3/blob/main/EER_Project_3.png?raw=true)
+
 </details>
 
 Before I could integrate the auditor’s report, I realized it was crucial to fully understand the **database structure**. This meant starting with an **Entity Relationship Diagram (ERD)** to map out how the tables in the `md_water_services` database connected to each other.  
@@ -111,7 +113,8 @@ After mapping out the database structure with the ERD, the next step was to brin
 To prepare the database, I created a table to hold the auditor’s results:  
 
 <details>
-<summary>Click to view output</summary>
+<summary>Click to view SQL query</summary>
+  
 ```sql
 DROP TABLE IF EXISTS `auditor_report`;
 CREATE TABLE `auditor_report` (
@@ -121,6 +124,7 @@ CREATE TABLE `auditor_report` (
   `statements` VARCHAR(255)
 );
 ```
+
 </details>
 
 I then imported the `.csv` file. The dataset contained **1,620 records**, each representing a revisited water source.  
@@ -158,7 +162,7 @@ A challenge appeared:
 To bring these together, I wrote the following query:  
 
 <details>
-<summary>Click to view output</summary>
+<summary>Click to view SQL query</summary>
 ```sql
 SELECT 
     v.location_id AS visit_locationid,
@@ -172,6 +176,7 @@ JOIN auditor_report AS a
 JOIN water_quality AS w
     ON v.record_id = w.record_id;
 ```
+  
 </details>
 
 
