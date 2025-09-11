@@ -214,7 +214,7 @@ SELECT
     v.record_id AS record_id,
     v.location_id AS location_id,
     w.subjective_quality_score AS surveyor_score,
-    a.true_water_source_score AS auditor_score
+    a.true_water_source_score AS auditor_water_score
 FROM visits AS v
 JOIN auditor_report AS a
     ON v.location_id = a.location_id
@@ -231,7 +231,7 @@ Now the output is tidy and easy to interpret — just one `location_id`, plus th
 <details>
 <summary>Click to view output</summary>
 
-| record\_id | location\_id | surveyor\_score | auditor\_score |
+| record\_id | location\_id | surveyor\_score | auditor_water\_score |
 | ---------- | ------------ | --------------- | -------------- |
 | 5185       | SoRu34980    | 2               | 1              |
 | 59367      | AkRu08112    | 4               | 3              |
@@ -239,6 +239,177 @@ Now the output is tidy and easy to interpret — just one `location_id`, plus th
 | ...        | ...          | ...             | ...            |
 
 </details>
+
+
+### 🔎 Analyzing Auditor vs Surveyor Scores
+
+Since we were joining **1,620 rows of data**, I wanted to make sure I kept track of how many rows I got back each time I ran a query.  
+
+- In MySQL Workbench, you can increase the limit (from *1000 rows* to something like *10000*).  
+- Or you can force SQL to give you everything using `LIMIT 10000`.  
+
+With that set, I moved on to the analysis.
+
+---
+
+#### ✅ Step 1: Check Where Scores Agree
+
+The first thing I wanted to know was: **Do the auditors’ independent scores agree with the surveyors’ recorded scores?**  
+
+I tried two approaches:  
+- Use a `WHERE` clause to check if `surveyor_score = auditor_score`  
+- Or subtract the two scores and check if the result = `0`
+
+<details>
+<summary>💻 SQL Query (Checking Agreement)</summary>
+
+```sql
+SELECT 
+    v.record_id AS visit_recordid,
+    a.location_id AS auditor_locationid,
+    a.true_water_source_score AS auditor_score,
+    w.subjective_quality_score AS surveyor_score
+FROM visits AS v
+JOIN auditor_report AS a
+    ON v.location_id = a.location_id
+JOIN water_quality AS w
+    ON v.record_id = w.record_id
+WHERE (a.true_water_source_score - w.subjective_quality_score = 0);
+```
+
+</details>
+
+🔢 **Result**: I got **2,505 rows**. But wait… some locations were visited multiple times, which introduced duplicates.
+
+
+#### 🧹 Step 2: Remove Duplicates
+
+To fix this, I restricted results to only the **first visit per site** using `v.visit_count = 1`.
+
+<details> 
+<summary>💻 SQL Query (Removing Duplicates)</summary>
+
+```sql  
+SELECT 
+    v.record_id AS visit_recordid,
+    a.location_id AS auditor_locationid,
+    a.true_water_source_score AS auditor_score,
+    w.subjective_quality_score AS surveyor_score
+FROM visits AS v
+JOIN auditor_report AS a
+    ON v.location_id = a.location_id
+JOIN water_quality AS w
+    ON v.record_id = w.record_id
+WHERE (a.true_water_source_score - w.subjective_quality_score = 0)
+AND  v.visit_count = 1;
+```
+
+</details>
+
+🔢 **Result**: Now I got **1,518 rows**.
+
+📊 **Interpretation**:
+
+- Auditor visited **1,620 sites**
+- **1,518 matched** the surveyor’s scores
+- That’s **94% agreement** ✅
+- Which means **102 sites (6%) had discrepancies** ❌
+
+#### ⚠️ Step 3: Look at the Mismatches
+
+To inspect the mismatched cases, I just flipped the operator (`!= 0` instead of `= 0`).
+
+<details> 
+<summary>💻 SQL Query (Finding Discrepancies)</summary>
+
+```sql
+SELECT 
+    v.record_id AS visit_record_id,
+    a.location_id AS auditor_location_id,
+    a.true_water_source_score AS auditor_score,
+    w.subjective_quality_score AS surveyor_score
+FROM visits AS v
+JOIN auditor_report AS a
+    ON v.location_id = a.location_id
+JOIN water_quality AS w
+    ON v.record_id = w.record_id
+WHERE (a.true_water_source_score - w.subjective_quality_score != 0)
+AND  v.visit_count = 1;
+```
+
+</details>
+
+
+📊 **Sample Output (Discrepancies)**
+
+<details> 
+<summary>💻 Click to view the table with sample data with discrepancies)</summary>
+
+
+| location\_id | record\_id | auditor\_score | surveyor\_score |
+| ------------ | ---------- | -------------- | --------------- |
+| AkRu05215    | 21160      | 3              | 10              |
+| KiRu29290    | 7938       | 3              | 10              |
+| KiHa22748    | 43140      | 9              | 10              |
+| SoRu37841    | 18495      | 6              | 10              |
+| KiRu27884    | 33931      | 1              | 10              |
+| KiZu31170    | 17950      | 9              | 10              |
+| ...          | ...        | ...            | ...             |
+
+</details>
+
+#### 🔍 Step 4: Double-Check Water Source Integrity
+
+Since we relied heavily on the `type_of_water_source` in earlier analysis, I wanted to make sure these mismatched scores didn’t mean we also had mismatched water sources.
+
+So I joined the `water_source` table and compared the auditor’s source type with the surveyor’s source type.
+
+<details> 
+<summary>💻 SQL Query (Checking Source Type Integrity)</summary>
+
+```sql
+SELECT 
+    v.record_id AS visit_record_id,
+    a.location_id AS auditor_location_id,
+    a.true_water_source_score AS auditor_score,
+    w.subjective_quality_score AS surveyor_score,
+    a.type_of_water_source AS auditor_source,
+    s.type_of_water_source AS survey_source
+FROM visits AS v
+JOIN auditor_report AS a
+    ON v.location_id = a.location_id
+JOIN water_quality AS w
+    ON v.record_id = w.record_id
+JOIN water_source AS s
+    ON v.source_id = s.source_id
+WHERE (a.true_water_source_score - w.subjective_quality_score != 0)
+AND  v.visit_count = 1;
+```
+
+</details>
+
+📊 **Sample Output (Source Type Comparison)**
+
+<details> 
+<summary>💻 Click to view the table with sample data with additional features for source type comparison)</summary>
+
+| location\_id | auditor\_source       | survey\_source        | record\_id | auditor\_score | surveyor\_score |
+| ------------ | --------------------- | --------------------- | ---------- | -------------- | --------------- |
+| AkRu05215    | well                  | well                  | 21160      | 3              | 10              |
+| KiRu29290    | shared\_tap           | shared\_tap           | 7938       | 3              | 10              |
+| KiHa22748    | tap\_in\_home\_broken | tap\_in\_home\_broken | 43140      | 9              | 10              |
+| SoRu37841    | shared\_tap           | shared\_tap           | 18495      | 6              | 10              |
+| KiRu27884    | well                  | well                  | 33931      | 1              | 10              |
+
+</details>
+
+> [!Note]
+> ##### 🎯 Conclusion
+> 
+> Even though **scores differed in 102 cases**, the **water source types matched**.
+> This means the **core integrity of the source data remains intact**, and our earlier analyses using `type_of_water_source` are still valid.
+>
+> Once I confirmed this, I removed the extra `JOIN` and columns again to keep things simple.
 
 ## 🔗 Linking Records: Joining employee data to the report
 ---
