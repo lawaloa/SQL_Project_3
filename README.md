@@ -157,18 +157,21 @@ A challenge appeared:
 
 - The **`auditor_report`** table used `location_id`  
 - The **`water_quality`** table used `record_id`  
-- The **`visits`** table acted as the bridge, since it links `location_id` and `record_id`  
+- The **`visits`** table acted as the bridge, since it links `location_id` and `record_id`
 
-To bring these together, I wrote the following query:  
+To bring these together, I wrote the following query and to make the results easier to read, I also renamed the scores:  
+
+- `surveyor_score` → from the `water_quality` table  
+- `auditor_water_score` → from the `auditor_report` table    
 
 <details>
 <summary>Click to view SQL query</summary>
   
 ```sql
 SELECT 
-    v.location_id AS visit_locationid,
-    v.record_id AS visit_recordid,
-    a.location_id AS auditor_locationid,
+    v.location_id AS visit_location_id,
+    v.record_id AS visit_record_id,
+    a.location_id AS auditor_location_id,
     a.true_water_source_score AS auditor_water_score,
     w.subjective_quality_score AS surveyor_score
 FROM visits AS v
@@ -188,13 +191,54 @@ The query produced a comparison of the auditor’s independent scores and the su
 <details>
 <summary>Click to view output</summary>
 
-| location_id | auditor_water_score | surveyor_score |
-|-------------|---------------------|----------------|
-| AkHa00008   | 3                   | 5              |
-| AkHa00053   | 9                   | 6              |
-| ...         | ...                 | ...            |
+| visit_location_id | visit_record_id | audit_location_id | auditor_water__score | surveyor_quality_score |
+|-------------------|-----------------|------------------|-----------------------|--------------------------|
+| SoRu34980         | 5185            | SoRu34980      | 1                        | 2                        |
+| AkRu08112         | 59367           | AkRu08112      | 3                        | 4                        |
+| AkLu02044         | 37379           | AkLu02044      | 0                        | 1                        |
+| ...               | ...             | ...            | ...                      | ...                      |
+
 </details>
 
+#### 🧹 Cleaning Up the Join Results
+
+At first, my query gave me **two `location_id` columns** — one from `visits` and one from `auditor_report`. Since they were duplicates, I decided to keep **just one `location_id`** (from `visits`) along with `record_id` as the anchor for linking data.  
+
+
+
+<details>
+<summary>Click to view 💻 Cleaned SQL Query</summary>
+
+```sql
+SELECT 
+    v.record_id AS record_id,
+    v.location_id AS location_id,
+    w.subjective_quality_score AS surveyor_score,
+    a.true_water_source_score AS auditor_score
+FROM visits AS v
+JOIN auditor_report AS a
+    ON v.location_id = a.location_id
+JOIN water_quality AS w
+    ON v.record_id = w.record_id;
+```
+
+</details>
+
+📊 **Cleaned Sample Output**
+
+Now the output is tidy and easy to interpret — just one `location_id`, plus the surveyor’s and auditor’s scores:
+
+<details>
+<summary>Click to view output</summary>
+
+| record\_id | location\_id | surveyor\_score | auditor\_score |
+| ---------- | ------------ | --------------- | -------------- |
+| 5185       | SoRu34980    | 2               | 1              |
+| 59367      | AkRu08112    | 4               | 3              |
+| 37379      | AkLu02044    | 1               | 0              |
+| ...        | ...          | ...             | ...            |
+
+</details>
 
 ## 🔗 Linking Records: Joining employee data to the report
 ---
