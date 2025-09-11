@@ -22,8 +22,7 @@ At the heart of the story is an independent audit of the Maji Ndogo water projec
 
 For me, this project wasn’t just about practicing SQL. It was about **learning how to weave analysis into a narrative** — turning queries and numbers into a compelling data story that resonates with both technical and non-technical audiences.  
 
-✅ Skills Applied:  
-SQL · Joins · Data Cleaning · Data Aggregation · Filtering · Grouping · Counting · Data Validation · Data Integrity Checks · Exploratory Data Analysis (EDA) · Analytical Thinking · Data Storytelling
+✅ Skills Applied:  SQL · Joins · Data Cleaning · Data Aggregation · Filtering · Grouping · Counting · Data Validation · Data Integrity Checks · Exploratory Data Analysis (EDA) · Analytical Thinking · Data Storytelling
 
 ---
 
