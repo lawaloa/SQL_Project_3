@@ -416,15 +416,13 @@ AND  v.visit_count = 1;
 ## 🔗 Linking Records: Joining employee data to the report
 ---
 
-Now that I’ve identified the 102 incorrect records, the next step was to dig deeper and see who was responsible for assigning those scores.
-
-At some of the locations, employees recorded incorrect scores — and those records made it into this error set.
+Now that I’ve identified the 102 incorrect records, the next step was to dig deeper and see who was responsible for assigning those scores. At some of the locations, employees recorded incorrect scores — and those records made it into this error set.
 
 I think there are two possible reasons this happened:
 
-These workers are humans, and mistakes are bound to occur.
+1. These workers are humans, and mistakes are bound to occur.
 
-Alternatively, there could have been intentional misreporting (which would be more serious).
+2. Alternatively, there could have been intentional misreporting (which would be more serious).
 
 Either way, the **employees were the source of the discrepancies**, so I decided to **JOIN the** `assigned_employee_id` from the `employee` table with the query. This allowed me to directly link each incorrect record to the staff member who submitted it.
 
@@ -641,7 +639,9 @@ GROUP BY employee_name;
 
 </details>
 
-> [!WARNING] 🔍 Spotting Patterns in Mistakes  
+> [!WARNING]
+>
+> ### 🔍 Spotting Patterns in Mistakes  
 >  
 > - A **few surveyors** are responsible for a **large number of mistakes**.  
 > - Most surveyors only made a handful of errors.  
