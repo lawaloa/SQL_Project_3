@@ -654,7 +654,130 @@ GROUP BY employee_name;
 ## 🔍 Gathering Evidence: Building a complex query seeking truth
 ---
 
-*(Content placeholder – highlight the complex SQL queries you wrote to uncover tampered records)*  
+Alright, let me think this through. If I really want to figure out whether any of our employees might be corrupt, I need to dig into the data carefully.  
+
+I know that **everyone makes mistakes**. That’s normal. But if someone is corrupt, they’re probably going to make **a lot more mistakes than the average employee**.  
+
+Now, I don’t want to jump to conclusions — what if they’re just clumsy? That’s why I need to gather some **solid evidence** before pointing fingers.  
+
+The auditor also mentioned that some shady rumors made it into the `statements` column. So if I look at both **mistake counts** and those **auditor notes**, I should get a clearer picture of who’s really suspicious.  
+
+---
+
+### Step 1: Counting mistakes  
+First things first — I need to count how many mistakes each employee made. That’ll give me a baseline `error_count`.  
+
+<details>
+<summary>🔽 Show SQL Query</summary>
+
+```sql
+WITH error_count AS (
+    WITH Incorrect_records AS (
+        SELECT 
+            v.record_id AS visit_recordid,
+            a.location_id AS auditor_locationid,
+            a.true_water_source_score AS auditor_score,
+            w.subjective_quality_score AS surveyor_score,
+            e.employee_name AS employee_name
+        FROM visits AS v
+        JOIN auditor_report AS a
+            ON v.location_id = a.location_id
+        JOIN water_quality AS w
+            ON v.record_id = w.record_id
+        JOIN employee AS e
+            ON v.assigned_employee_id = e.assigned_employee_id
+        WHERE (a.true_water_source_score - w.subjective_quality_score != 0)
+        AND v.visit_count = 1
+    )
+    SELECT 
+        employee_name,
+        COUNT(employee_name) AS number_of_mistakes
+    FROM Incorrect_records
+    GROUP BY employee_name
+)
+SELECT
+    AVG(number_of_mistakes) AS avg_error_count_per_empl
+FROM error_count;
+```
+
+</details>
+
+📊 **Sample Output**
+
+<details> 
+<summary>💻 Click to view the table</summary>
+
+| avg\_error\_count\_per\_empl |
+| ---------------------------- |
+| 6.0                          |
+
+</details>
+
+So on average, employees make about 6 mistakes each.
+
+
+### Step 2: Finding suspects
+
+Now comes the interesting part.
+I want to know who made more mistakes than the average — because those are my prime suspects. 🚨
+
+<details> 
+<summary>🔽 Show SQL Query</summary>
+
+```sql
+WITH error_count AS (
+    WITH Incorrect_records AS (
+        SELECT 
+            v.record_id AS visit_recordid,
+            a.location_id AS auditor_locationid,
+            a.true_water_source_score AS auditor_score,
+            w.subjective_quality_score AS surveyor_score,
+            e.employee_name AS employee_name
+        FROM visits AS v
+        JOIN auditor_report AS a
+            ON v.location_id = a.location_id
+        JOIN water_quality AS w
+            ON v.record_id = w.record_id
+        JOIN employee AS e
+            ON v.assigned_employee_id = e.assigned_employee_id
+        WHERE (a.true_water_source_score - w.subjective_quality_score != 0)
+        AND v.visit_count = 1
+    )
+    SELECT 
+        employee_name,
+        COUNT(employee_name) AS number_of_mistakes
+    FROM Incorrect_records
+    GROUP BY employee_name
+)
+SELECT
+    employee_name,
+    number_of_mistakes
+FROM error_count
+WHERE number_of_mistakes > (
+    SELECT AVG(number_of_mistakes) 
+    FROM error_count
+);
+```
+
+</details>
+
+📊 **Sample Output**
+
+<details> 
+<summary>💻 Click to view the table</summary>
+
+| employee\_name | number\_of\_mistakes |
+| -------------- | -------------------- |
+| Bello Azibo    | 26                   |
+|Zuriel Matembo  | 17                   |
+| Malachi Mavuso | 21                   |
+| Lalitha Kaburi | 7                    |
+
+</details>
+
+So there it is — my **suspect list**. These employees made way more mistakes than average, and that’s enough for me to raise an eyebrow. 👀
+
+⚖️ Of course, this doesn’t prove corruption yet. But when I line this up with the shady auditor statements, the story starts to look pretty convincing.
 
 ---
 
