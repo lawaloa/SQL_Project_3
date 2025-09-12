@@ -780,6 +780,82 @@ So there it is — my **suspect list**. These employees made way more mistakes t
 
 ⚖️ Of course, this doesn’t prove corruption yet. But when I line this up with the shady auditor statements, the story starts to look pretty convincing.
 
+
+### 🧹 Cleaning Up with a SQL View
+
+At this point, I realized my queries were getting pretty long and messy.  
+The **`Incorrect_records`** result is something I’ll be using again and again throughout the analysis.  
+
+👉 Instead of repeating the same CTE everywhere, I decided to convert it into a **VIEW**.  
+This makes my code **much simpler and more readable**.  
+
+⚠️ The tradeoff:  
+- CTEs are easier to document with inline comments.  
+- Views, however, make your code cleaner but don’t carry those inline explanations.  
+
+So the best practice is to **add comments wherever I use the view** later on — just to remind myself (or anyone else reading this a year later) what it actually represents.  
+
+---
+
+### Creating the View
+
+<details>
+<summary>🔽 Show SQL Query</summary>
+
+```sql
+DROP VIEW IF EXISTS Incorrect_records;
+
+CREATE VIEW Incorrect_records AS (
+    SELECT 
+        v.record_id AS visit_recordid,
+        a.location_id AS auditor_locationid,
+        a.true_water_source_score AS auditor_score,
+        w.subjective_quality_score AS surveyor_score,
+        e.employee_name AS employee_name,
+        a.statements AS statements
+    FROM visits AS v
+    JOIN auditor_report AS a
+        ON v.location_id = a.location_id
+    JOIN water_quality AS w
+        ON v.record_id = w.record_id
+    JOIN employee AS e
+        ON v.assigned_employee_id = e.assigned_employee_id
+    WHERE (a.true_water_source_score - w.subjective_quality_score != 0)
+    AND v.visit_count = 1
+);
+```
+</details>
+
+**Testing the View**
+
+To confirm it works exactly like my earlier CTE, I just run:
+
+<details> 
+<summary>🔽 Show SQL Query</summary>
+
+```sql
+-- This gives us the same result as the CTE did.
+SELECT * FROM Incorrect_records;
+```
+
+</details>
+
+
+📊 **Sample Output**
+
+<details> 
+<summary>💻 Click to view the table</summary>
+
+| visit\_recordid | auditor\_locationid | auditor\_score | surveyor\_score | employee\_name | statements                          |
+| --------------- | ------------------- | -------------- | --------------- | -------------- | ----------------------------------- |
+| 21160           | AkRu05215           | 3              | 10              | Rudo Imani     | A grandmother's wisdom was shared in the queue, her stories of better days juxtaposed with the current water crisis.|
+| 7938            | KiRu29290           | 3              | 10              | Bello Azibo    | Villagers' wary accounts of an official's arrogance and detachment from their concerns raised suspicions. The mention of cash changing hands further tainted their perception.|
+| 43140           | KiHa22748           | 9              | 10              | Bello Azibo    | An air of mistrust surrounded the official, as villagers spoke of laziness and hints of corruption. The mention of cash passing discreetly only deepened their concerns. |
+| ...             | ...                 | ...            | ...             | ...            | ...                                 |
+
+</details>
+
+
 ---
 
 ## ✨ Personal Takeaway  
