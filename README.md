@@ -766,14 +766,13 @@ WHERE number_of_mistakes > (
 <details> 
 <summary>💻 Click to view the table</summary>
 
-+-----------------+-------------------+
+
 | employee_name   | number_of_mistakes|
-+-----------------+-------------------+
+|-----------------|-------------------|
 | Bello Azibo     | 27                |
 | Zuriel Matenbo  | 17                |
 | Malachi Mavuso  | 21                |
 | Lalitha Kaburi  | 7                 |
-+-----------------+-------------------+
 
 </details>
 
