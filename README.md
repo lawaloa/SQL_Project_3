@@ -856,6 +856,150 @@ SELECT * FROM Incorrect_records;
 </details>
 
 
+#### 🔎 Digging Deeper: Who’s Making the Most Mistakes?
+
+At this point, I wanted to go beyond just spotting mistakes. The real question was:
+
+👉 *Are some employees consistently making way more mistakes than everyone else?*
+
+To answer that, I broke it down into a few steps:
+
+---
+
+#### 1️⃣ Count the Mistakes per Employee
+
+First, I wrapped the counting logic into a **CTE** called `error_count`. This makes the query easier to read and reuse.
+
+<details> 
+<summary>💻 SQL Query</summary>
+
+```sql
+WITH error_count AS ( -- This CTE calculates the number of mistakes each employee made
+    SELECT
+        employee_name,
+        COUNT(employee_name) AS number_of_mistakes
+    FROM Incorrect_records
+    /* Incorrect_records is a view that joins the audit report 
+       to the database for records where the auditor 
+       and employee scores are different */
+    GROUP BY employee_name
+)
+-- Test it out
+SELECT * FROM error_count;
+```
+
+</details>
+
+
+#### 2️⃣ Find the Average Mistakes
+
+Next, I calculated the **average number of mistakes**across all employees. This gives me a baseline to compare against.
+
+<details> 
+<summary>💻 SQL Query</summary>
+
+```sql
+SELECT
+    AVG(number_of_mistakes) AS avg_error_count_per_empl
+FROM error_count;
+```
+
+</details>
+
+
+### 3️⃣ Identify Employees Above Average
+
+Finally, I filtered out the employees whose mistake count is **greater than the average**. These are my potential suspects 🚨.
+
+<details> 
+<summary>💻 SQL Query</summary>
+
+```sql
+WITH error_count AS (
+    SELECT
+        employee_name,
+        COUNT(employee_name) AS number_of_mistakes
+    FROM Incorrect_records
+    GROUP BY employee_name
+)
+SELECT
+    employee_name,
+    number_of_mistakes
+FROM error_count
+WHERE number_of_mistakes > (
+    SELECT AVG(number_of_mistakes)
+    FROM error_count
+);
+```
+
+</details>
+
+**Here’s what I found**:
+
+<details> 
+<summary>💻 Click to view the table</summary>
+	
+| employee\_name     | number\_of\_mistakes |
+| ------------------ | -------------------- |
+| **Bello Azibo**    | 26                   |
+| **Malachi Mavuso** | 21                   |
+| **Zuriel Matembo** | 17                   |
+| **Lalitha Kaburi** | 7                    |
+
+</details>
+
+💡 These four employees are making **more mistakes than the average person**. Time to zoom in on them.
+
+#### 4️⃣ Isolating Their Records
+
+Numbers alone aren’t enough. To really understand what’s happening, I wanted to **read through the statements** these employees wrote when collecting data. That way I could see if there were patterns — bias, vagueness, or even suspiciously misleading notes.
+
+So I created a second CTE, `suspect_list`, and pulled out all the records linked to these employees.
+
+<details> 
+<summary>💻 SQL Query</summary>
+
+WITH error_count AS ( -- Counts mistakes per employee
+    SELECT
+        employee_name,
+        COUNT(employee_name) AS number_of_mistakes
+    FROM Incorrect_records
+    GROUP BY employee_name
+),
+suspect_list AS ( -- Filters employees above average
+    SELECT
+        employee_name,
+        number_of_mistakes
+    FROM error_count
+    WHERE number_of_mistakes > (SELECT AVG(number_of_mistakes) FROM error_count)
+)
+-- Get all records for the suspect employees
+SELECT
+    employee_name,
+    auditor_locationid,
+    statements
+FROM Incorrect_records
+WHERE employee_name IN (SELECT employee_name FROM suspect_list);
+```
+
+</details>
+
+And here’s a sample of what came back:
+
+<details> 
+<summary>💻 Click to view the table</summary>
+
+| employee\_name     | auditor\_locationid | statements                                           |
+| ------------------ | ------------------- | ---------------------------------------------------- |
+| **Bello Azibo**    | KiIs23853           | Villagers' wary accounts of an official's arrogance… |
+| Bello Azibo        | KiHa22748           | A young girl's hopeful eyes…                         |
+| Bello Azibo        | KiRu27884           | A traditional healer's empathy…                      |
+| **Zuriel Matembo** | KiZu31170           | A community leader stood with…                       |
+| Bello Azibo        | AkRu06495           | A healthcare worker in…                              |
+
+</details>
+
+✅ So now I had both the **numbers (mistake counts)** and the **stories (statements)**. And honestly, this is where the project really started to feel like detective work.
 ---
 
 ## ✨ Personal Takeaway  
