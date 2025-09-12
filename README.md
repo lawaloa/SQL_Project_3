@@ -565,7 +565,10 @@ Now that I have the `Incorrect_records` table, I can start asking better questio
 
 First, I wanted to see which employees even showed up in this error list. That’s as simple as grabbing **distinct names**:
 
-<details> <summary>💻 Click to view SQL query</summary>
+<details> 
+<summary>💻 Click to view SQL query</summary>
+
+```sql
 WITH Incorrect_records AS (
     SELECT 
         v.record_id AS visit_recordid,
@@ -585,6 +588,7 @@ WITH Incorrect_records AS (
 )
 SELECT DISTINCT employee_name
 FROM Incorrect_records;
+```
 
 </details>
 
@@ -637,16 +641,14 @@ GROUP BY employee_name;
 
 </details>
 
-> #### 🔍 Spotting Patterns in Mistakes  
->  
-> Looking at the results, a clear pattern emerges:  
+> [!WARNING] 🔍 Spotting Patterns in Mistakes  
 >  
 > - A **few surveyors** are responsible for a **large number of mistakes**.  
-> - Meanwhile, most surveyors only made a handful of errors.  
+> - Most surveyors only made a handful of errors.  
 >  
-> That doesn’t sit right with me! 😬 It raises the possibility that these aren’t just random mistakes — some scores may have been **intentionally recorded incorrectly**.  
+> 😬 That doesn’t sit right with me! It raises the possibility that these aren’t just random mistakes — some scores may have been **intentionally recorded incorrectly**.  
 >  
-> ⚖️ While human error is expected, this distribution — where a small group of employees is responsible for most of the discrepancies — is **suspicious and worth investigating further**.  
+> ⚖️ This distribution suggests that while human error is expected, **a concentrated cluster of mistakes by certain employees** is suspicious and worth investigating further.  
 
 
 ## 🔍 Gathering Evidence: Building a complex query seeking truth
