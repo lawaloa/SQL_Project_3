@@ -959,6 +959,7 @@ So I created a second CTE, `suspect_list`, and pulled out all the records linked
 <details> 
 <summary>💻 SQL Query</summary>
 
+```sql
 WITH error_count AS ( -- Counts mistakes per employee
     SELECT
         employee_name,
