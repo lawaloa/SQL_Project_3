@@ -1,8 +1,15 @@
 # SQL PROJECT 3 | 💧 Maji Ndogo Water Crisis – Turning Data into Community Insights  
-
 ---
 
+## 👤 Author
+---
+
+**Omotola Lawal**  
+📅 12th June, 2025  
+🔗 [LinkedIn](https://www.linkedin.com/in/omotola-lawal-541b9b131)
+
 ## 📑 Table of Contents
+---
 
 - [Project Overview: Setting the stage for our data exploration journey](#project-overview-setting-the-stage-for-our-data-exploration-journey) 
 - [Generating an ERD: Understanding the database structure](#-generating-an-erd-understanding-the-database-structure)  
@@ -10,6 +17,7 @@
 - [Linking records: Joining employee data to the report](#-linking-records-joining-employee-data-to-the-report)  
 - [Gathering evidence: Building a complex query seeking truth](#-gathering-evidence-building-a-complex-query-seeking-truth)  
 - [Personal Reflection](#-personal-reflection)  
+- [📑 Reference](#-reference)
 
 ---
 
@@ -1074,7 +1082,7 @@ So the allegations of bribery are **isolated only to them**.
 
 At this point, here’s what we know about **Zuriel Matembo**, **Malachi Mavuso**, **Bello Azibo**, and **Lalitha Kaburi**:
 
-1. 📊 They ** made more mistakes than average** compared to their peers.
+1. 📊 They **made more mistakes than average** compared to their peers.
 
 2. 💸 They are the **only employees with incriminating "cash" statements** tied to their records.
 
@@ -1105,6 +1113,13 @@ In the right hands, data doesn’t just describe reality — it **shapes better 
 
 ---
 
-👤 **Author:** Tendai Mubarak  
+## 📑 Reference
+---
+
+- 📚 ALX Data Programs: Querying Data: Integrated Project 3 – Maji Ndogo: From Analysis to Action.
+
+- Dataset: Maji Ndogo Water Services – a fictional but realistic dataset designed for SQL practice, data cleaning, and exploratory analysis.
+
+- Author’s Contribution: All SQL queries, cleaning steps, and analysis documented here were personally executed as part of this project build.
 
 
