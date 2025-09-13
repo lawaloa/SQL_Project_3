@@ -209,7 +209,7 @@ The query produced a comparison of the auditor’s independent scores and the su
 <details>
 <summary>Click to view output</summary>
 
-| visit_location_id | visit_record_id | audit_location_id | auditor_water__score | surveyor_quality_score |
+| visit_location_id | visit_record_id | audit_location_id | auditor_water_score | surveyor_score |
 |-------------------|-----------------|------------------|-----------------------|--------------------------|
 | SoRu34980         | 5185            | SoRu34980      | 1                        | 2                        |
 | AkRu08112         | 59367           | AkRu08112      | 3                        | 4                        |
@@ -232,7 +232,7 @@ SELECT
     v.record_id AS record_id,
     v.location_id AS location_id,
     w.subjective_quality_score AS surveyor_score,
-    a.true_water_source_score AS auditor_water_score
+    a.true_water_source_score AS auditor_score
 FROM visits AS v
 JOIN auditor_report AS a
     ON v.location_id = a.location_id
@@ -249,7 +249,7 @@ Now the output is tidy and easy to interpret — just one `location_id`, plus th
 <details>
 <summary>Click to view output</summary>
 
-| record\_id | location\_id | surveyor\_score | auditor_water\_score |
+| record\_id | location\_id | surveyor\_score | auditor\_score |
 | ---------- | ------------ | --------------- | -------------- |
 | 5185       | SoRu34980    | 2               | 1              |
 | 59367      | AkRu08112    | 4               | 3              |
