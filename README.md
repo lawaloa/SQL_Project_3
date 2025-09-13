@@ -11,7 +11,7 @@
 ## 📑 Table of Contents
 ---
 
-- [Project Overview: Setting the stage for our data exploration journey](#project-overview-setting-the-stage-for-our-data-exploration-journey) 
+- [Project Overview: Setting the stage for our data exploration journey](#-project-overview-setting-the-stage-for-our-data-exploration-journey) 
 - [Generating an ERD: Understanding the database structure](#-generating-an-erd-understanding-the-database-structure)  
 - [Integrating the report: Adding the auditor report to our database](#-integrating-the-report-adding-the-auditor-report-to-our-database)  
 - [Linking records: Joining employee data to the report](#-linking-records-joining-employee-data-to-the-report)  
