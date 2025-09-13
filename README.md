@@ -9,7 +9,7 @@
 - [Integrating the report: Adding the auditor report to our database](#-integrating-the-report-adding-the-auditor-report-to-our-database)  
 - [Linking records: Joining employee data to the report](#-linking-records-joining-employee-data-to-the-report)  
 - [Gathering evidence: Building a complex query seeking truth](#-gathering-evidence-building-a-complex-query-seeking-truth)  
-- [Personal Takeaway](#-personal-takeaway)  
+- [Personal Reflection](#-personal-reflection)  
 
 ---
 
@@ -22,7 +22,15 @@ At the heart of the story is an independent audit of the Maji Ndogo water projec
 
 For me, this project wasn’t just about practicing SQL. It was about **learning how to weave analysis into a narrative** — turning queries and numbers into a compelling data story that resonates with both technical and non-technical audiences.  
 
-✅ Skills Applied:  SQL · Joins · Data Cleaning · Data Aggregation · Filtering · Grouping · Counting · Data Validation · Data Integrity Checks · Exploratory Data Analysis (EDA) · Analytical Thinking · Data Storytelling
+> ## ✅ Skills Applied  
+> 
+> - **SQL Fundamentals**: Joins · Filtering · Grouping · Counting · Aggregation  
+> - **Data Cleaning & Validation**: Ensuring accuracy · Handling inconsistencies · Integrity checks  
+> - **Exploratory Data Analysis (EDA)**: Identifying anomalies · Spotting patterns · Investigating outliers  
+> - **Analytical Thinking**: Breaking down complex queries step by step · Building queries with CTEs · Iterative testing  
+> - **Data Storytelling**: Translating raw data into actionable insights · Highlighting corruption patterns · Presenting findings clearly  
+> - **Problem-Solving**: Structuring queries for scalability · Debugging errors · Logical reasoning with nested queries  
+> - **Governance & Accountability Focus**: Using data analysis as a tool for transparency, fairness, and decision-making
 
 ---
 
@@ -600,8 +608,8 @@ Next, I wanted to see *how many times each employee messed up*. Basically, we ju
 ```sql
 WITH Incorrect_records AS (
 SELECT 
-    v.record_id AS visit_recordid,
-    a.location_id AS auditor_locationid,
+    v.record_id AS visit_record_id,
+    a.location_id AS auditor_location_id,
     a.true_water_source_score AS auditor_score,
     w.subjective_quality_score AS surveyor_score,
     e.employee_name AS employee_name
@@ -674,8 +682,8 @@ First things first — I need to count how many mistakes each employee made. Tha
 WITH error_count AS (
     WITH Incorrect_records AS (
         SELECT 
-            v.record_id AS visit_recordid,
-            a.location_id AS auditor_locationid,
+            v.record_id AS visit_record_id,
+            a.location_id AS auditor_location_id,
             a.true_water_source_score AS auditor_score,
             w.subjective_quality_score AS surveyor_score,
             e.employee_name AS employee_name
@@ -728,8 +736,8 @@ I want to know who made more mistakes than the average — because those are my 
 WITH error_count AS (
     WITH Incorrect_records AS (
         SELECT 
-            v.record_id AS visit_recordid,
-            a.location_id AS auditor_locationid,
+            v.record_id AS visit_record_id,
+            a.location_id AS auditor_location_id,
             a.true_water_source_score AS auditor_score,
             w.subjective_quality_score AS surveyor_score,
             e.employee_name AS employee_name
@@ -805,8 +813,8 @@ DROP VIEW IF EXISTS Incorrect_records;
 
 CREATE VIEW Incorrect_records AS (
     SELECT 
-        v.record_id AS visit_recordid,
-        a.location_id AS auditor_locationid,
+        v.record_id AS visit_record_id,
+        a.location_id AS auditor_location_id,
         a.true_water_source_score AS auditor_score,
         w.subjective_quality_score AS surveyor_score,
         e.employee_name AS employee_name,
@@ -844,7 +852,7 @@ SELECT * FROM Incorrect_records;
 <details> 
 <summary>💻 Click to view the table</summary>
 
-| visit\_recordid | auditor\_locationid | auditor\_score | surveyor\_score | employee\_name | statements                          |
+| visit\_record_id | auditor\_location_id | auditor\_score | surveyor\_score | employee\_name | statements                          |
 | --------------- | ------------------- | -------------- | --------------- | -------------- | ----------------------------------- |
 | 21160           | AkRu05215           | 3              | 10              | Rudo Imani     | A grandmother's wisdom was shared in the queue, her stories of better days juxtaposed with the current water crisis.|
 | 7938            | KiRu29290           | 3              | 10              | Bello Azibo    | Villagers' wary accounts of an official's arrogance and detachment from their concerns raised suspicions. The mention of cash changing hands further tainted their perception.|
@@ -975,7 +983,7 @@ suspect_list AS ( -- Filters employees above average
 -- Get all records for the suspect employees
 SELECT
     employee_name,
-    auditor_locationid,
+    auditor_location_id,
     statements
 FROM Incorrect_records
 WHERE employee_name IN (SELECT employee_name FROM suspect_list);
@@ -988,23 +996,112 @@ And here’s a sample of what came back:
 <details> 
 <summary>💻 Click to view the table</summary>
 
-| employee\_name     | auditor\_locationid | statements                                           |
+| employee\_name     | auditor\_location_id | statements                                           |
 | ------------------ | ------------------- | ---------------------------------------------------- |
 | **Bello Azibo**    | KiIs23853           | Villagers' wary accounts of an official's arrogance… |
 | Bello Azibo        | KiHa22748           | A young girl's hopeful eyes…                         |
 | Bello Azibo        | KiRu27884           | A traditional healer's empathy…                      |
 | **Zuriel Matembo** | KiZu31170           | A community leader stood with…                       |
 | Bello Azibo        | AkRu06495           | A healthcare worker in…                              |
+|...                 |....                 |....                                                  |
 
 </details>
 
 ✅ So now I had both the **numbers (mistake counts)** and the **stories (statements)**. And honestly, this is where the project really started to feel like detective work.
 
+#### 🔍 Filtering "Cash" Mentions
+
+If you take a closer look, you’ll notice some **alarming statements** tied to these four officials. (Examples: `AkRu04508`, `AkRu07310`, `KiRu29639`, `AmAm09607`).
+
+One thing that stood out immediately: the **word "cash"** keeps appearing in their statements. That raised a big red flag for me. 💸
+
+So I decided to filter the records specifically for mentions of *cash*.
+
+Here’s the query I used:
+
+<details> 
+<summary>💻 SQL Query</summary>
+
+```sql
+-- For employees with fewer mistakes than average
+WITH error_count AS ( 
+    SELECT
+        employee_name,
+        COUNT(employee_name) AS number_of_mistakes
+    FROM Incorrect_records
+    /* Incorrect_records is a view that joins the audit report 
+       to the database for mismatched auditor vs employee scores */
+    GROUP BY employee_name
+)
+SELECT
+    ir.employee_name,
+    ir.statements
+FROM Incorrect_records AS ir
+JOIN error_count AS ec
+    ON ir.employee_name = ec.employee_name
+WHERE
+    ir.statements LIKE '%cash%'
+    AND ec.number_of_mistakes < (SELECT AVG(number_of_mistakes) FROM error_count);
+
+-- For employees with more mistakes than average
+WITH error_count AS (
+    SELECT
+        employee_name,
+        COUNT(employee_name) AS number_of_mistakes
+    FROM Incorrect_records
+    GROUP BY employee_name
+)
+SELECT
+    ir.employee_name,
+    ir.statements
+FROM Incorrect_records AS ir
+JOIN error_count AS ec
+    ON ir.employee_name = ec.employee_name
+WHERE
+    ir.statements LIKE '%cash%'
+    AND ec.number_of_mistakes > (SELECT AVG(number_of_mistakes) FROM error_count);
+```
+
+</details>
+
+✅ **The Result**
+
+To my surprise (and also relief in a way), the result came back **empty** for everyone else. That means **no employee outside our four suspects** had any statements involving “cash.”
+
+So the allegations of bribery are **isolated only to them**.
+
+### ⚖️ Summing Up the Evidence
+
+At this point, here’s what we know about **Zuriel Matembo**, **Malachi Mavuso**, **Bello Azibo**, and **Lalitha Kaburi**:
+
+1. 📊 They ** made more mistakes than average** compared to their peers.
+
+2. 💸 They are the **only employees with incriminating "cash" statements** tied to their records.
+
+This isn’t *decisive proof* of corruption, but let’s be honest: it’s concerning enough that we can’t ignore it.
+
+Pres. Naledi has worked tirelessly to stamp out corruption in our system, and she would urge us to bring this forward.
+
 ---
 
-## ✨ Personal Takeaway  
+## ✨ Personal Reflection
+---
 
-Working on this project has reinforced my belief that **data is more than numbers — it is a powerful story-telling tool.** SQL empowered me to not only detect inconsistencies but also to narrate the findings in a way that matters for decision-making and governance.  
+I have to admit — this one stings. When I started this project, I wanted to highlight mistakes so we could improve training and make things fairer.
+
+But instead, I uncovered signs of **potential bribery** right under our noses. 😞
+
+It’s disappointing, but I know what must be done. I’ll be reporting this to Pres. Naledi with the evidence we’ve gathered.
+
+Because if we truly want to **fight corruption and build a culture of fairness and accountability**, we cannot afford to look the other way.  
+
+Working on this project has reinforced my belief that **data is more than just rows and columns — it is a lens that can expose hidden truths.**  
+
+Through SQL, I was able to move beyond detecting simple inconsistencies to actually **uncovering patterns of misconduct that point to corruption.**  
+
+This wasn’t just about cleaning data; it was about showing how **data analysis can serve governance, transparency, and integrity.**  
+
+In the right hands, data doesn’t just describe reality — it **shapes better decisions and strengthens trust in institutions.**
 
 ---
 
