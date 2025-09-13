@@ -783,11 +783,9 @@ So there it is — my **suspect list**. These employees made way more mistakes t
 
 ### 🧹 Cleaning Up with a SQL View
 
-At this point, I realized my queries were getting pretty long and messy.  
-The **`Incorrect_records`** result is something I’ll be using again and again throughout the analysis.  
+At this point, I realized my queries were getting pretty long and messy. The **`Incorrect_records`** result is something I’ll be using again and again throughout the analysis.  
 
-👉 Instead of repeating the same CTE everywhere, I decided to convert it into a **VIEW**.  
-This makes my code **much simpler and more readable**.  
+👉 Instead of repeating the same CTE everywhere, I decided to convert it into a **VIEW**. This makes my code **much simpler and more readable**.  
 
 ⚠️ The tradeoff:  
 - CTEs are easier to document with inline comments.  
@@ -797,7 +795,7 @@ So the best practice is to **add comments wherever I use the view** later on —
 
 ---
 
-### Creating the View
+#### Creating the View
 
 <details>
 <summary>🔽 Show SQL Query</summary>
@@ -866,7 +864,7 @@ To answer that, I broke it down into a few steps:
 
 ---
 
-#### 1️⃣ Count the Mistakes per Employee
+##### 1️⃣ Count the Mistakes per Employee
 
 First, I wrapped the counting logic into a **CTE** called `error_count`. This makes the query easier to read and reuse.
 
@@ -891,7 +889,7 @@ SELECT * FROM error_count;
 </details>
 
 
-#### 2️⃣ Find the Average Mistakes
+##### 2️⃣ Find the Average Mistakes
 
 Next, I calculated the **average number of mistakes**across all employees. This gives me a baseline to compare against.
 
@@ -907,7 +905,7 @@ FROM error_count;
 </details>
 
 
-### 3️⃣ Identify Employees Above Average
+##### 3️⃣ Identify Employees Above Average
 
 Finally, I filtered out the employees whose mistake count is **greater than the average**. These are my potential suspects 🚨.
 
@@ -950,7 +948,7 @@ WHERE number_of_mistakes > (
 
 💡 These four employees are making **more mistakes than the average person**. Time to zoom in on them.
 
-#### 4️⃣ Isolating Their Records
+##### 4️⃣ Isolating Their Records
 
 Numbers alone aren’t enough. To really understand what’s happening, I wanted to **read through the statements** these employees wrote when collecting data. That way I could see if there were patterns — bias, vagueness, or even suspiciously misleading notes.
 
@@ -1001,6 +999,7 @@ And here’s a sample of what came back:
 </details>
 
 ✅ So now I had both the **numbers (mistake counts)** and the **stories (statements)**. And honestly, this is where the project really started to feel like detective work.
+
 ---
 
 ## ✨ Personal Takeaway  
