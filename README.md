@@ -1,11 +1,11 @@
-# SQL PROJECT 3 | 💧 Maji Ndogo Water Crisis – Turning Data into Community Insights  
+# SQL Project 3 | 💧 Maji Ndogo Water Crisis – Uncovering Corruption Through Data  
 ---
 
 ## 👤 Author
 ---
 
 **Omotola Lawal**  
-📅 12th June, 2025  
+📅 20th June, 2025  
 🔗 [LinkedIn](https://www.linkedin.com/in/omotola-lawal-541b9b131)
 
 ## 📑 Table of Contents
