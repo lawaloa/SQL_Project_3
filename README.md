@@ -77,15 +77,6 @@ Sincerely,
 
 ---
 
-> [!Note]
-> ### 💡 Key Takeaways  
->
-> - Practiced **SQL queries, ERDs, joins, and aggregations** in a real-world styled project.  
-> - Learned to approach datasets as stories — beyond numbers, they reflect lived experiences.  
-> - Developed stronger skills in **data validation, auditing, and storytelling** for both technical and non-technical audiences.  
-
----
-
 ## 🔗 Generating an ERD: Understanding the database structure
 ---
 
