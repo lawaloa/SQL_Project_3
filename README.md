@@ -108,7 +108,7 @@ I double-checked the database and confirmed that `record_id` is unique in both t
 
 This small exercise was a powerful reminder: **getting the relationships right at the start prevents big headaches later**. Misrepresenting relationships could lead to faulty joins, misleading results, and ultimately bad decisions. By carefully validating the ERD, I ensured my queries (and the audit integration) would stand on solid ground.  
 
-
+---
 
 ## 📥 Integrating the Report: Adding the auditor report to our database
 ---
@@ -420,6 +420,7 @@ AND  v.visit_count = 1;
 >
 > Once I confirmed this, I removed the extra `JOIN` and columns again to keep things simple.
 
+---
 ## 🔗 Linking Records: Joining employee data to the report
 ---
 
@@ -541,9 +542,9 @@ This way, I can call it like a table in any follow-up analysis without rewriting
 ```sql
 WITH Incorrect_records AS (
     SELECT 
-        v.record_id AS visit_recordid,
-        a.location_id AS auditor_locationid,
-        a.true_water_source_score AS auditor_score,
+        v.record_id AS visit_record_id,
+        a.location_id AS auditor_location_id,
+        a.true_water_source_score AS auditor_water_score,
         w.subjective_quality_score AS surveyor_score,
         e.employee_name AS employee_name
     FROM visits AS v
@@ -683,7 +684,7 @@ WITH error_count AS (
         SELECT 
             v.record_id AS visit_record_id,
             a.location_id AS auditor_location_id,
-            a.true_water_source_score AS auditor_score,
+            a.true_water_source_score AS auditor_water_score,
             w.subjective_quality_score AS surveyor_score,
             e.employee_name AS employee_name
         FROM visits AS v
@@ -737,7 +738,7 @@ WITH error_count AS (
         SELECT 
             v.record_id AS visit_record_id,
             a.location_id AS auditor_location_id,
-            a.true_water_source_score AS auditor_score,
+            a.true_water_source_score AS auditor_water_score,
             w.subjective_quality_score AS surveyor_score,
             e.employee_name AS employee_name
         FROM visits AS v
@@ -814,7 +815,7 @@ CREATE VIEW Incorrect_records AS (
     SELECT 
         v.record_id AS visit_record_id,
         a.location_id AS auditor_location_id,
-        a.true_water_source_score AS auditor_score,
+        a.true_water_source_score AS auditor_water_score,
         w.subjective_quality_score AS surveyor_score,
         e.employee_name AS employee_name,
         a.statements AS statements
