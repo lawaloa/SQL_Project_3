@@ -232,7 +232,7 @@ SELECT
     v.record_id AS record_id,
     v.location_id AS location_id,
     w.subjective_quality_score AS surveyor_score,
-    a.true_water_source_score AS auditor_score
+    a.true_water_source_score AS auditor_water_score
 FROM visits AS v
 JOIN auditor_report AS a
     ON v.location_id = a.location_id
@@ -249,7 +249,7 @@ Now the output is tidy and easy to interpret — just one `location_id`, plus th
 <details>
 <summary>Click to view output</summary>
 
-| record\_id | location\_id | surveyor\_score | auditor\_score |
+| record\_id | location\_id | surveyor\_score | auditor_water\_score |
 | ---------- | ------------ | --------------- | -------------- |
 | 5185       | SoRu34980    | 2               | 1              |
 | 59367      | AkRu08112    | 4               | 3              |
@@ -283,9 +283,9 @@ I tried two approaches:
 
 ```sql
 SELECT 
-    v.record_id AS visit_recordid,
-    a.location_id AS auditor_locationid,
-    a.true_water_source_score AS auditor_score,
+    v.record_id AS visit_record_id,
+    a.location_id AS auditor_location_id,
+    a.true_water_source_score AS auditor_water_score,
     w.subjective_quality_score AS surveyor_score
 FROM visits AS v
 JOIN auditor_report AS a
@@ -309,9 +309,9 @@ To fix this, I restricted results to only the **first visit per site** using `v.
 
 ```sql  
 SELECT 
-    v.record_id AS visit_recordid,
-    a.location_id AS auditor_locationid,
-    a.true_water_source_score AS auditor_score,
+    v.record_id AS visit_record_id,
+    a.location_id AS auditor_location_id,
+    a.true_water_source_score AS auditor_water_score,
     w.subjective_quality_score AS surveyor_score
 FROM visits AS v
 JOIN auditor_report AS a
@@ -344,7 +344,7 @@ To inspect the mismatched cases, I just flipped the operator (`!= 0` instead of 
 SELECT 
     v.record_id AS visit_record_id,
     a.location_id AS auditor_location_id,
-    a.true_water_source_score AS auditor_score,
+    a.true_water_source_score AS auditor_water_score,
     w.subjective_quality_score AS surveyor_score
 FROM visits AS v
 JOIN auditor_report AS a
@@ -364,7 +364,7 @@ AND  v.visit_count = 1;
 <summary>💻 Click to view the table with sample data with discrepancies</summary>
 
 
-| location\_id | record\_id | auditor\_score | surveyor\_score |
+| location\_id | record\_id | auditor_water\_score | surveyor\_score |
 | ------------ | ---------- | -------------- | --------------- |
 | AkRu05215    | 21160      | 3              | 10              |
 | KiRu29290    | 7938       | 3              | 10              |
@@ -389,7 +389,7 @@ So I joined the `water_source` table and compared the auditor’s source type wi
 SELECT 
     v.record_id AS visit_record_id,
     a.location_id AS auditor_location_id,
-    a.true_water_source_score AS auditor_score,
+    a.true_water_source_score AS auditor_water_score,
     w.subjective_quality_score AS surveyor_score,
     a.type_of_water_source AS auditor_source,
     s.type_of_water_source AS survey_source
@@ -411,7 +411,7 @@ AND  v.visit_count = 1;
 <details> 
 <summary>💻 Click to view the table with sample data with additional features for source type comparison</summary>
 
-| location\_id | auditor\_source       | survey\_source        | record\_id | auditor\_score | surveyor\_score |
+| auditor_location\_id | auditor\_source       | survey\_source        | visit_record\_id | auditor_water\_score | surveyor\_score |
 | ------------ | --------------------- | --------------------- | ---------- | -------------- | --------------- |
 | AkRu05215    | well                  | well                  | 21160      | 3              | 10              |
 | KiRu29290    | shared\_tap           | shared\_tap           | 7938       | 3              | 10              |
@@ -451,7 +451,7 @@ Here’s the query I wrote:
 SELECT 
     v.record_id AS visit_record_id, 
     a.location_id AS auditor_location_id, 
-    a.true_water_source_score AS auditor_score,
+    a.true_water_source_score AS auditor_water_score,
     w.subjective_quality_score AS surveyor_score,
     e.assigned_employee_id AS assigned_employee_id
 FROM visits AS v
@@ -472,8 +472,8 @@ WHERE (a.true_water_source_score - w.subjective_quality_score != 0)
 <details> 
 <summary>💻 Click to view the table</summary>
   
-| location\_id | visit\_record\_id | assigned\_employee\_id | auditor\_score | surveyor\_score |
-| ------------ | ----------------- | ---------------------- | -------------- | --------------- |
+| auditor_location\_id | visit\_record\_id | assigned\_employee\_id | auditor_water\_score | surveyor\_score |
+| ------------------- | ----------------- | ---------------------- | -------------- | --------------- |
 | AkRu05215    | 21160             | 34                     | 3              | 10              |
 | KiRu29290    | 7938              | 1                      | 3              | 10              |
 | KiHa22748    | 43140             | 1                      | 9              | 10              |
@@ -499,7 +499,7 @@ This way, I can directly see *which employees* are responsible for the discrepan
 SELECT 
     v.record_id AS visit_record_id, 
     a.location_id AS auditor_location_id, 
-    a.true_water_source_score AS auditor_score,
+    a.true_water_source_score AS auditor_water_score,
     w.subjective_quality_score AS surveyor_score,
     e.employee_name AS employee_name
 FROM visits AS v
@@ -520,7 +520,7 @@ WHERE (a.true_water_source_score - w.subjective_quality_score != 0)
 <details> 
 <summary>💻 Click to view the table</summary>
 
-| location\_id | visit\_record\_id | employee\_name | auditor\_score | surveyor\_score |
+| auditor_location\_id | visit\_record\_id | employee\_name | auditor_water\_score | surveyor\_score |
 | ------------ | ----------------- | -------------- | -------------- | --------------- |
 | AkRu05215    | 21160             | Rudo Imani     | 3              | 10              |
 | KiRu29290    | 7938              | Bello Azibo    | 3              | 10              |
@@ -860,7 +860,7 @@ SELECT * FROM Incorrect_records;
 <details> 
 <summary>💻 Click to view the table</summary>
 
-| visit\_record_id | auditor\_location_id | auditor\_score | surveyor\_score | employee\_name | statements                          |
+| visit\_record_id | auditor\_location_id | auditor_water\_score | surveyor\_score | employee\_name | statements                          |
 | --------------- | ------------------- | -------------- | --------------- | -------------- | ----------------------------------- |
 | 21160           | AkRu05215           | 3              | 10              | Rudo Imani     | A grandmother's wisdom was shared in the queue, her stories of better days juxtaposed with the current water crisis.|
 | 7938            | KiRu29290           | 3              | 10              | Bello Azibo    | Villagers' wary accounts of an official's arrogance and detachment from their concerns raised suspicions. The mention of cash changing hands further tainted their perception.|
