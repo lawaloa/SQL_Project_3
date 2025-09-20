@@ -17,18 +17,23 @@
 - [Linking records: Joining employee data to the report](#-linking-records-joining-employee-data-to-the-report)  
 - [Gathering evidence: Building a complex query seeking truth](#-gathering-evidence-building-a-complex-query-seeking-truth)  
 - [Personal Reflection](#-personal-reflection)  
-- [📑 Reference](#-reference)
+- [Reference](#-reference)
 
 ---
+
 
 ## 📝 Project Overview: Setting the stage for our data exploration journey
 ---
 
-This project reflects my personal journey into SQL and its ability to transform raw datasets into actionable insights. The **Maji Ndogo Water Crisis Project** is a fictional case study crafted to simulate real-world scenarios of database auditing, governance, and community-centered decision-making.  
+This project is more than just a collection of SQL queries — it was a journey into how **data can expose the truth hidden in plain sight**.  
+By analyzing mismatches between surveyor reports and auditor scores, I uncovered patterns of mistakes that pointed to **potential corrupt practices**.  
 
-At the heart of the story is an independent audit of the Maji Ndogo water project, where discrepancies in water source records demanded closer scrutiny. By writing SQL queries, building Entity Relationship Diagrams (ERDs), and experimenting with joins and aggregations, I explored how data can reveal both truths and irregularities — ultimately shaping better governance.  
+For me, this went far beyond practicing SQL syntax. It strengthened my understanding of how data analysis can be applied to **real-world challenges in governance, fairness, and accountability**.  
 
-For me, this project wasn’t just about practicing SQL. It was about **learning how to weave analysis into a narrative** — turning queries and numbers into a compelling data story that resonates with both technical and non-technical audiences.  
+At its core, this project shows how **SQL is not just about databases** — it is about using data as a **storytelling tool** to highlight issues that prevent communities from enjoying the resources that are rightfully theirs.  
+
+The story centers on an independent audit of the **Maji Ndogo water project**, where discrepancies in water source records demanded closer scrutiny. Through writing SQL queries, building Entity Relationship Diagrams (ERDs), and experimenting with joins, aggregations, and filtering, I explored how data can uncover both truths and irregularities — ultimately showing how analysis can **inform better governance and stronger institutions**.  
+
 
 > ## ✅ Skills Applied  
 > 
