@@ -25,8 +25,7 @@
 ## 📝 Project Overview: Setting the stage for our data exploration journey
 ---
 
-This project is more than just a collection of SQL queries — it was a journey into how **data can expose the truth hidden in plain sight**.  
-By analyzing mismatches between surveyor reports and auditor scores, I uncovered patterns of mistakes that pointed to **potential corrupt practices**.  
+This project is more than just a collection of SQL queries — it was a journey into how **data can expose the truth hidden in plain sight**. By analyzing mismatches between surveyor reports and auditor scores, I uncovered patterns of mistakes that pointed to **potential corrupt practices**.  
 
 For me, this went far beyond practicing SQL syntax. It strengthened my understanding of how data analysis can be applied to **real-world challenges in governance, fairness, and accountability**.  
 
